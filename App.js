@@ -1,7 +1,5 @@
 import 'react-native-gesture-handler';
 
-// App.js가 루트 컴포넌트가 되는거임
-
 import React from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -18,20 +16,16 @@ import Actions from './components/Actions'
 // https://ionicons.com/
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import { createStore } from 'redux'
+import { Provider } from 'react-redux'
+
+import rootReducer from './redux/reducers'
+
+const store = createStore(rootReducer)
+
 const Tab = createBottomTabNavigator();
 const ListStack = createStackNavigator();
 const HomeStack = createStackNavigator();
-
-
-const ListStackScreen = () => {
-  return (
-    <ListStack.Navigator>
-      <ListStack.Screen name="List" component={List} options={{title:"List of Products", headerTitleAlign:"center"}} />
-      <ListStack.Screen name="Details" component={Details} options={{title:"Details", headerTitleAlign:"center"}}  />
-    </ListStack.Navigator>
-  )
-}
-
 
 const HomeStackScreen = () => {
   return (
@@ -42,17 +36,25 @@ const HomeStackScreen = () => {
   )
 }
 
+const ListStackScreen = () => {
+  return (
+    <ListStack.Navigator>
+      <ListStack.Screen name="List" component={List} options={{title:"List", headerTitleAlign:"center"}} />
+      <ListStack.Screen name="Details" component={Details} options={{title:"Details", headerTitleAlign:"center"}}  />
+    </ListStack.Navigator>
+  )
+}
 
 const screenOptions = ({ route }) => ({
   tabBarIcon: ({ focused, color, size }) => {
     let iconName;
 
     switch(route.name){
-      // focus가 있으면 'home' 아이콘, 없으면 'home-outline'
+      // focus가 있으면 'home', 'home-outline'
       case 'Home':
         iconName = focused
           ? 'home'
-          : 'home-outline';
+          : 'home-outline';        
         break;
       case 'List':
         iconName = focused
@@ -63,9 +65,9 @@ const screenOptions = ({ route }) => ({
         iconName = focused
           ? 'checkmark'
           : 'checkmark-outline'; 
-        break;
+        break;       
     }
-
+    
     // You can return any component that you like here!
     return <Ionicons name={iconName} size={size} color={color} />;
   },
@@ -78,14 +80,16 @@ const tabBarOptions= {
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <Tab.Navigator screenOptions={screenOptions} tabBarOptions={tabBarOptions}>
-          <Tab.Screen name="Home" component={HomeStackScreen}/>
-          <Tab.Screen name="List" component={ListStackScreen}/>
-          <Tab.Screen name="Actions" component={Actions}/>
-        </Tab.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <Tab.Navigator screenOptions={screenOptions} tabBarOptions={tabBarOptions}>
+            <Tab.Screen name="Home" component={HomeStackScreen} />
+            <Tab.Screen name="List" component={ListStackScreen} />
+            <Tab.Screen name="Actions" component={Actions} />
+          </Tab.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </Provider>
   );
 }
